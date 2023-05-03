@@ -6,7 +6,7 @@ from office365.sharepoint.client_context import ClientContext
 from office365.runtime.auth.user_credential import UserCredential
 
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __author__ = "Khilal-Shpiro Mukhammed"
 
 
@@ -118,13 +118,13 @@ class SharePoint:
         new_folder = parent_folder.folders.add(new_folder).execute_query()
 
     @decorator_root_folder
-    def get_files_list(self, parent_folder) -> list:
+    def get_files_list(self, parent_folder: str) -> list:
         """
         Description:
             Get list of files in the specified path
 
         Parametrs:
-            ::folder_name - folder in which we want to get a list of files
+            ::parent_folder - folder in which we want to get a list of files
 
         Example:
             get_files_list("General/Документы")
@@ -146,7 +146,7 @@ class SharePoint:
             Get list of folders in the specified path
 
         Parametrs:
-            ::folder_name - folder in which we want to get a list of folders
+            ::parent_folder - folder in which we want to get a list of folders
 
         Example:
             get_folder_list("General")
