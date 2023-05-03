@@ -1,5 +1,6 @@
 import os
 from dataclasses import dataclass, field
+from decorators import decorator_root_folder
 from office365.sharepoint.files.file import File
 from office365.sharepoint.client_context import ClientContext
 from office365.runtime.auth.user_credential import UserCredential
@@ -94,7 +95,8 @@ class SharePoint:
             file_name=os.path.basename(sharepoint_source), file_obj=file_obj, destination=destination
         )
 
-    def create_folder(self, parent_folder: str, new_folder: str) -> None:
+    @decorator_root_folder
+    def create_folder(self, parent_folder, new_folder: str) -> None:
         """
         Description:
             Create new folder under some parent folder
@@ -113,12 +115,10 @@ class SharePoint:
         Return:
             This function does not return anything, it just creates folder under it's parent folder
         """
-        target_folder = self.session.web.get_folder_by_server_relative_url(
-            f"{self.doc}/{parent_folder}"
-        )
-        new_folder = target_folder.folders.add(new_folder).execute_query()
+        new_folder = parent_folder.folders.add(new_folder).execute_query()
 
-    def get_files_list(self, folder_name: str) -> list:
+    @decorator_root_folder
+    def get_files_list(self, parent_folder) -> list:
         """
         Description:
             Get list of files in the specified path
@@ -135,14 +135,12 @@ class SharePoint:
             we recived one object, because we have one file in 
             "/sites/ps.all/Shared Documents/General/Документы"
         """
-        root_folder = self.session.web.get_folder_by_server_relative_url(
-            f'{self.doc}/{folder_name}'
-        )
-        root_folder.expand(["Files", "Folders"]).get().execute_query()
+        parent_folder.expand(["Files", "Folders"]).get().execute_query()
 
-        return root_folder.files
+        return parent_folder.files
 
-    def get_folder_list(self, folder_name: str) -> list:
+    @decorator_root_folder
+    def get_folder_list(self, parent_folder: str) -> list:
         """
         Description:
             Get list of folders in the specified path
@@ -160,12 +158,9 @@ class SharePoint:
             we recived two objects, because we have two folders in 
             "/sites/ps.all/Shared Documents/General"
         """
-        root_folder = self.session.web.get_folder_by_server_relative_url(
-            f'{self.doc}/{folder_name}'
-        )
-        root_folder.expand(["Folders"]).get().execute_query()
+        parent_folder.expand(["Folders"]).get().execute_query()
 
-        return root_folder.folders
+        return parent_folder.folders
 
     def get_file_properties_from_folder(self, folder_name: str) -> list:
         """
